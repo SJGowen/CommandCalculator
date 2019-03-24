@@ -5,6 +5,7 @@ A command line calculator that will evaluate a string containing the following o
   2. Power ^;
   3. Division / Remainder % and Multiplcation *;
   4. Addition + and Subtraction -;
+  
 If the string contains multiple operators they are acted on in the order from the top. If they are shown in the same bullet point they are acted on in a left to right sequence.
 
 This is an example of how you would use CommandCalculator or Calculator.cs
