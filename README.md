@@ -6,7 +6,7 @@ A command line calculator that will evaluate an equation or string containing th
   3. Division / Remainder % and Multiplcation *
   4. Addition + and Subtraction -
   
-If the equation contains multiple operators they are acted on in the order from top to bottom. If they are shown in the same bullet point they are acted on in a left to right of the equation order.
+If the equation contains multiple operators they are acted on in the order from top to bottom of the list. If they are shown in the same bullet point they are acted on in a left to right sequence of the order that they appear in the equation.
 
 This is an example of how you would use CommandCalculator or Calculator.cs
 
