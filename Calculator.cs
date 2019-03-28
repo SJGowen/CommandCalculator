@@ -137,7 +137,7 @@ namespace CommandCalculator
             return bitIndex == 0 || !float.TryParse(bits[bitIndex - 1], out var _);
         }
 
-        private void CondenseListByDoing(List<string> bits, string mathsOperator)
+        private void CondenseListByDoing(IList<string> bits, string mathsOperator)
         {
             if (bits.Count == 1) return;
 
@@ -169,9 +169,8 @@ namespace CommandCalculator
             WriteDebugMessageAndArray($"After ConsolidateListByDoing ({mathsOperator}).\t", bits);
         }
 
-        private static void WriteDebugMessageAndArray(string message, List<string> bits)
+        private static void WriteDebugMessageAndArray(string message, IEnumerable<string> bits)
         {
-            if (!Debugger.IsAttached) return;
             Debug.WriteLine($"{message}Bits = '{string.Join(' ', bits)}'.");
         }
 
