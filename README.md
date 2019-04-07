@@ -23,7 +23,7 @@ This is an example of how you would use CommandCalculator or Calculator.cs
                 var calculator = new Calculator();
                 do
                 {   
-                    Console.Write("calculator> ");
+                    Console.Write("Calculate > ");
                     equation = Console.ReadLine();
                     var result = calculator.Calculate(equation);
                     Console.WriteLine(result);
