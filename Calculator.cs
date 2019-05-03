@@ -8,12 +8,13 @@ namespace CommandCalculator
     public class Calculator
     {
         private readonly string _invalidExpression = "Invalid expression.";
+        private static readonly char _decimalSeparator = '.';
         private bool _floatingPointExpression;
 
         public string Calculate(string equation)
         {
             equation = RemoveSpaces(equation);
-            _floatingPointExpression = equation.Contains('.');
+            _floatingPointExpression = equation.Contains(_decimalSeparator);
             if (!ParenthesisIsBalanced(equation)) return _invalidExpression;
             equation = EvaluateParenthesisedPiecesOfEquation(equation);
             return WeightedCalculate(equation);
@@ -81,7 +82,7 @@ namespace CommandCalculator
             var bits = new List<string>();
             foreach (var character in equation)
             {
-                if (int.TryParse(character.ToString(), out var _) || character == '.')
+                if (int.TryParse(character.ToString(), out var _) || character == _decimalSeparator)
                 {
                     bit += character;
                 }
@@ -102,7 +103,7 @@ namespace CommandCalculator
             return bits;
         }
 
-        private void ApplyNegatives(IList<string> bits)
+        private void ApplyNegatives(List<string> bits)
         {
             if (bits.IndexOf("-") == -1) return;
             var bitIndex = 0;
@@ -132,12 +133,12 @@ namespace CommandCalculator
             }
         }
 
-        private static bool NoNumberPrecedesThisCharacter(IList<string> bits, int bitIndex)
+        private static bool NoNumberPrecedesThisCharacter(List<string> bits, int bitIndex)
         {
             return bitIndex == 0 || !float.TryParse(bits[bitIndex - 1], out var _);
         }
 
-        private void CondenseListByDoing(IList<string> bits, string mathsOperator)
+        private void CondenseListByDoing(List<string> bits, string mathsOperator)
         {
             if (bits.Count == 1) return;
 
@@ -174,7 +175,7 @@ namespace CommandCalculator
             Debug.WriteLine($"{message}Bits = '{string.Join(' ', bits)}'.");
         }
 
-        private void CondenseAsFloat(IList<string> bits, int bitIndex)
+        private void CondenseAsFloat(List<string> bits, int bitIndex)
         {
             if (!float.TryParse(bits[bitIndex - 1], out var float1) ||
                 (!float.TryParse(bits[bitIndex + 1], out var float2))) return;
@@ -207,7 +208,7 @@ namespace CommandCalculator
             bits.RemoveAt(bitIndex - 1);
         }
 
-        private void CondenseAsInt(IList<string> bits, int bitIndex)
+        private void CondenseAsInt(List<string> bits, int bitIndex)
         {
             if (!int.TryParse(bits[bitIndex - 1], out var integer1) ||
                 (!int.TryParse(bits[bitIndex + 1], out var integer2))) return;
