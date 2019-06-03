@@ -49,7 +49,7 @@ namespace CommandCalculator
                         length = equationIndex - startIndex;
                     }
 
-                    equationIndex += 1;
+                    equationIndex++;
                 }
 
                 if (length <= 0) continue;
@@ -133,12 +133,12 @@ namespace CommandCalculator
             }
         }
 
-        private static bool NoNumberPrecedesThisCharacter(List<string> bits, int bitIndex)
+        private static bool NoNumberPrecedesThisCharacter(IReadOnlyList<string> bits, int bitIndex)
         {
             return bitIndex == 0 || !float.TryParse(bits[bitIndex - 1], out var _);
         }
 
-        private void CondenseListByDoing(List<string> bits, string mathsOperator)
+        private void CondenseListByDoing(IList<string> bits, string mathsOperator)
         {
             if (bits.Count == 1) return;
 
@@ -150,15 +150,12 @@ namespace CommandCalculator
                     WriteDebugMessageAndArray($"Looking at = '{bits[bitIndex]}'.\tLooking for = '{mathsOp.ToString()}'.\t", bits);
                     if (bits[bitIndex] == mathsOp.ToString())
                     {
-                        if (_floatingPointExpression)
-                        {
-                            CondenseAsFloat(bits, bitIndex);
-                        }
-                        else
-                        {
-                            CondenseAsInt(bits, bitIndex);
-                        }
+                        bits[bitIndex] = _floatingPointExpression 
+                            ? CalculateAsFloat(bits[bitIndex - 1], bits[bitIndex], bits[bitIndex + 1]) 
+                            : CalculateAsInteger(bits[bitIndex - 1], bits[bitIndex], bits[bitIndex + 1]);
 
+                        bits.RemoveAt(bitIndex + 1);
+                        bits.RemoveAt(bitIndex - 1);
                         bitIndex -= 2;
                         break;
                     }
@@ -175,70 +172,36 @@ namespace CommandCalculator
             Debug.WriteLine($"{message}Bits = '{string.Join(' ', bits)}'.");
         }
 
-        private void CondenseAsFloat(List<string> bits, int bitIndex)
+        private string CalculateAsFloat(string number1, string operation, string number2)
         {
-            if (!float.TryParse(bits[bitIndex - 1], out var float1) ||
-                (!float.TryParse(bits[bitIndex + 1], out var float2))) return;
-            switch (bits[bitIndex])
+            if (!float.TryParse(number1, out var float1) ||
+                (!float.TryParse(number2, out var float2))) return string.Empty;
+            switch (operation)
             {
-                case "^":
-                    bits[bitIndex] = Math.Pow(float1, float2).ToString("F");
-                    break;
-                case "*":
-                    bits[bitIndex] = (float1 * float2).ToString("F");
-                    break;
-                case "/":
-                    bits[bitIndex] = (float1 / float2).ToString("F");
-                    break;
-                case "%":
-                    bits[bitIndex] = (float1 % float2).ToString("F");
-                    break;
-                case "+":
-                    bits[bitIndex] = (float1 + float2).ToString("F");
-                    break;
-                case "-":
-                    bits[bitIndex] = (float1 - float2).ToString("F");
-                    break;
-                default:
-                    bits[bitIndex] = _invalidExpression;
-                    break;
+                case "^": return Math.Pow(float1, float2).ToString("F");
+                case "*": return (float1 * float2).ToString("F");
+                case "/": return (float1 / float2).ToString("F");
+                case "%": return (float1 % float2).ToString("F");
+                case "+": return (float1 + float2).ToString("F");
+                case "-": return (float1 - float2).ToString("F");
+                default: return _invalidExpression;
             }
-
-            bits.RemoveAt(bitIndex + 1);
-            bits.RemoveAt(bitIndex - 1);
         }
 
-        private void CondenseAsInt(List<string> bits, int bitIndex)
+        private string CalculateAsInteger(string number1, string operation, string number2)
         {
-            if (!int.TryParse(bits[bitIndex - 1], out var integer1) ||
-                (!int.TryParse(bits[bitIndex + 1], out var integer2))) return;
-            switch (bits[bitIndex])
+            if (!int.TryParse(number1, out var integer1) ||
+                (!int.TryParse(number2, out var integer2))) return String.Empty;
+            switch (operation)
             {
-                case "^":
-                    bits[bitIndex] = Math.Pow(integer1, integer2).ToString("F0");
-                    break;
-                case "*":
-                    bits[bitIndex] = (integer1 * integer2).ToString();
-                    break;
-                case "/":
-                    bits[bitIndex] = (integer1 / integer2).ToString();
-                    break;
-                case "%":
-                    bits[bitIndex] = (integer1 % integer2).ToString();
-                    break;
-                case "+":
-                    bits[bitIndex] = (integer1 + integer2).ToString();
-                    break;
-                case "-":
-                    bits[bitIndex] = (integer1 - integer2).ToString();
-                    break;
-                default:
-                    bits[bitIndex] = _invalidExpression;
-                    break;
+                case "^": return Math.Pow(integer1, integer2).ToString("F0");
+                case "*": return (integer1 * integer2).ToString();
+                case "/": return (integer1 / integer2).ToString();
+                case "%": return (integer1 % integer2).ToString();
+                case "+": return (integer1 + integer2).ToString();
+                case "-": return (integer1 - integer2).ToString();
+                default: return _invalidExpression;
             }
-
-            bits.RemoveAt(bitIndex + 1);
-            bits.RemoveAt(bitIndex - 1);
         }
     }
 }

@@ -55,6 +55,7 @@ namespace CommandCalculator
         [DataRow("Invalid expression.", "-23$23")]
         [DataRow("Invalid expression.", "-24//6")]
         [DataRow("Invalid expression.", "1+(24/-6))")]
+        [DataRow("Invalid expression.", "1+(24/-6O3)")]
         public void CalculationsWithErrorsTests(string expectedResult, string equation)
         {
             var calc = new Calculator();
