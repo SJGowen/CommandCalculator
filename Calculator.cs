@@ -70,9 +70,9 @@ namespace CommandCalculator
             ApplyNegatives(bits);
             if (bits.Count % 2 == 0) return _invalidExpression; // Valid expression have an odd number of bits
             if (bits.Count <= 1) return bits.Count == 1 ? bits[0] : _invalidExpression;
-            CondenseListByDoing(bits, "^");
-            CondenseListByDoing(bits, "/%*");
-            CondenseListByDoing(bits, "+-");
+            CondenseListByCalculating(bits, "^");
+            CondenseListByCalculating(bits, "/%*");
+            CondenseListByCalculating(bits, "+-");
             return bits.Count == 1 ? bits[0] : _invalidExpression;
         }
 
@@ -138,7 +138,7 @@ namespace CommandCalculator
             return bitIndex == 0 || !float.TryParse(bits[bitIndex - 1], out var _);
         }
 
-        private void CondenseListByDoing(IList<string> bits, string mathsOperator)
+        private void CondenseListByCalculating(IList<string> bits, string mathsOperator)
         {
             if (bits.Count == 1) return;
 
@@ -175,7 +175,7 @@ namespace CommandCalculator
         private string CalculateAsFloat(string number1, string operation, string number2)
         {
             if (!float.TryParse(number1, out var float1) ||
-                (!float.TryParse(number2, out var float2))) return string.Empty;
+                (!float.TryParse(number2, out var float2))) return _invalidExpression;
             switch (operation)
             {
                 case "^": return Math.Pow(float1, float2).ToString("F");
@@ -191,7 +191,7 @@ namespace CommandCalculator
         private string CalculateAsInteger(string number1, string operation, string number2)
         {
             if (!int.TryParse(number1, out var integer1) ||
-                (!int.TryParse(number2, out var integer2))) return String.Empty;
+                (!int.TryParse(number2, out var integer2))) return _invalidExpression;
             switch (operation)
             {
                 case "^": return Math.Pow(integer1, integer2).ToString("F0");
