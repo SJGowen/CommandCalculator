@@ -66,110 +66,110 @@ namespace CommandCalculator
             if (equation.Length == 0) return string.Empty;
             if (equation.Contains(_invalidExpression)) return _invalidExpression;
 
-            var bits = BreakUpEquation(equation);
-            ApplyNegatives(bits);
-            if (bits.Count % 2 == 0) return _invalidExpression; // Valid expression have an odd number of bits
-            if (bits.Count <= 1) return bits.Count == 1 ? bits[0] : _invalidExpression;
-            CondenseListByCalculating(bits, "^");
-            CondenseListByCalculating(bits, "/%*");
-            CondenseListByCalculating(bits, "+-");
-            return bits.Count == 1 ? bits[0] : _invalidExpression;
+            var list = BreakUpEquation(equation);
+            ApplyNegatives(list);
+            if (list.Count % 2 == 0) return _invalidExpression; // Valid expression have an odd number of list
+            if (list.Count <= 1) return list.Count == 1 ? list[0] : _invalidExpression;
+            CondenseListByCalculating(list, "^");
+            CondenseListByCalculating(list, "/%*");
+            CondenseListByCalculating(list, "+-");
+            return list.Count == 1 ? list[0] : _invalidExpression;
         }
 
         private static List<string> BreakUpEquation(string equation)
         {
-            var bit = string.Empty;
-            var bits = new List<string>();
+            var item = string.Empty;
+            var list = new List<string>();
             foreach (var character in equation)
             {
                 if (int.TryParse(character.ToString(), out var _) || character == _decimalSeparator)
                 {
-                    bit += character;
+                    item += character;
                 }
                 else
                 {
-                    if (bit != string.Empty)
+                    if (item != string.Empty)
                     {
-                        bits.Add(bit);
-                        bit = string.Empty;
+                        list.Add(item);
+                        item = string.Empty;
                     }
 
-                    bits.Add(character.ToString());
+                    list.Add(character.ToString());
                 }
             }
 
-            if (bit != string.Empty) bits.Add(bit);
+            if (item != string.Empty) list.Add(item);
 
-            return bits;
+            return list;
         }
 
-        private void ApplyNegatives(List<string> bits)
+        private void ApplyNegatives(List<string> list)
         {
-            if (bits.IndexOf("-") == -1) return;
-            var bitIndex = 0;
-            while (bitIndex < bits.Count)
+            if (list.IndexOf("-") == -1) return;
+            var itemIndex = 0;
+            while (itemIndex < list.Count)
             {
-                if (bits[bitIndex] == "-" && NoNumberPrecedesThisCharacter(bits, bitIndex))
+                if (list[itemIndex] == "-" && ItemPrecededByNonNumeric(list, itemIndex))
                 {
                     if (_floatingPointExpression)
                     {
-                        if (float.TryParse(bits[bitIndex + 1], out var float1))
+                        if (float.TryParse(list[itemIndex + 1], out var float1))
                         {
-                            bits[bitIndex + 1] = (float1 * -1).ToString("F");
-                            bits.RemoveAt(bitIndex);
+                            list[itemIndex + 1] = (float1 * -1).ToString("F");
+                            list.RemoveAt(itemIndex);
                         }
                     }
                     else
                     {
-                        if (int.TryParse(bits[bitIndex + 1], out var integer1))
+                        if (int.TryParse(list[itemIndex + 1], out var integer1))
                         {
-                            bits[bitIndex + 1] = (integer1 * -1).ToString();
-                            bits.RemoveAt(bitIndex);
+                            list[itemIndex + 1] = (integer1 * -1).ToString();
+                            list.RemoveAt(itemIndex);
                         }
                     }
                 }
 
-                bitIndex++;
+                itemIndex++;
             }
         }
 
-        private static bool NoNumberPrecedesThisCharacter(IReadOnlyList<string> bits, int bitIndex)
+        private static bool ItemPrecededByNonNumeric(IReadOnlyList<string> list, int itemIndex)
         {
-            return bitIndex == 0 || !float.TryParse(bits[bitIndex - 1], out var _);
+            return itemIndex == 0 || !float.TryParse(list[itemIndex - 1], out var _);
         }
 
-        private void CondenseListByCalculating(IList<string> bits, string mathsOperator)
+        private void CondenseListByCalculating(IList<string> list, string mathsOperator)
         {
-            if (bits.Count == 1) return;
+            if (list.Count == 1) return;
 
-            var bitIndex = 1; // Looking at operators only, hence start at 1 and increment by 2
-            while (bitIndex < bits.Count)
+            var itemIndex = 1; // Looking at operators only, hence start at 1 and increment by 2
+            while (itemIndex < list.Count)
             {
                 foreach (var mathsOp in mathsOperator)
                 {
-                    WriteDebugMessageAndArray($"Looking at = '{bits[bitIndex]}'.\tLooking for = '{mathsOp.ToString()}'.\t", bits);
-                    if (bits[bitIndex] == mathsOp.ToString())
+                    WriteDebugMessageAndArray($"Looking at = '{list[itemIndex]}'.\tLooking for = '{mathsOp.ToString()}'.\t", list);
+                    if (list[itemIndex] == mathsOp.ToString())
                     {
-                        bits[bitIndex] = _floatingPointExpression 
-                            ? CalculateAsFloat(bits[bitIndex - 1], bits[bitIndex], bits[bitIndex + 1]) 
-                            : CalculateAsInteger(bits[bitIndex - 1], bits[bitIndex], bits[bitIndex + 1]);
+                        list[itemIndex] = _floatingPointExpression 
+                            ? CalculateAsFloat(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1]) 
+                            : CalculateAsInteger(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1]);
 
-                        bits.RemoveAt(bitIndex + 1);
-                        bits.RemoveAt(bitIndex - 1);
-                        bitIndex -= 2;
+                        list.RemoveAt(itemIndex + 1);
+                        list.RemoveAt(itemIndex - 1);
+                        itemIndex -= 2;
                         break;
                     }
                 }
 
-                bitIndex += 2;
+                itemIndex += 2;
             }
 
-            WriteDebugMessageAndArray($"After ConsolidateListByDoing ({mathsOperator}).\t", bits);
+            WriteDebugMessageAndArray($"After ConsolidateListByDoing ({mathsOperator}).\t", list);
         }
 
-        private static void WriteDebugMessageAndArray(string message, IEnumerable<string> bits)
+        private static void WriteDebugMessageAndArray(string message, IEnumerable<string> list)
         {
-            Debug.WriteLine($"{message}Bits = '{string.Join(' ', bits)}'.");
+            Debug.WriteLine($"{message}list = '{string.Join(' ', list)}'.");
         }
 
         private string CalculateAsFloat(string number1, string operation, string number2)
