@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace CommandCalculator
+namespace System
 {
-    public static class StringExtensions
+    public static class StringExtensionsCalculate
     {
         private const string InvalidExpression = "Invalid expression.";
         private static readonly string DecimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
