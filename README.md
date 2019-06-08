@@ -11,7 +11,6 @@ If the equation contains multiple operators they are acted on in the order from 
 This is written as an extension method of the string class, therefore as long as you have the StringExtensionsCalculate.cs in scope and are using the System namespace all should be well.
 
     using System;
-    using CommandCalculator;
     
     namespace CommandPrompt
     {
