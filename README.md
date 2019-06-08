@@ -8,7 +8,7 @@ A command line calculator that will evaluate an equation or string containing th
   
 If the equation contains multiple operators they are acted on in the order from top to bottom of the list. If they are shown in the same bullet point they are acted on in a left to right sequence of the order that they appear in the equation.
 
-This is an example of how you would use CommandCalculator or Calculator.cs
+This is written as an extension method of the string class, therefore as long as you have the StringExtensionsCalculate.cs in scope and are using the System namespace all should be well.
 
     using System;
     using CommandCalculator;
@@ -19,15 +19,14 @@ This is an example of how you would use CommandCalculator or Calculator.cs
         {
             static void Main(string[] args)
             {
-                string equation;
-                var calculator = new Calculator();
-                do
+                while (true)
                 {   
                     Console.Write("Calculate > ");
-                    equation = Console.ReadLine();
-                    var result = calculator.Calculate(equation);
+                    var equation = Console.ReadLine();
+                    if (equation?.ToLower() == "exit") break;
+                    var result = equation.Calculate();
                     Console.WriteLine(result);
-                } while (equation?.ToLower() != "exit");
+                }
             }
         }
     }
