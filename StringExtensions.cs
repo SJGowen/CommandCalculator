@@ -2,20 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 
 namespace CommandCalculator
 {
-    public class Calculator
+    public static class StringExtensions
     {
-        private readonly string _invalidExpression = "Invalid expression.";
-        private static readonly char _decimalSeparator = '.';
-        private bool _floatingPointExpression;
+        private const string InvalidExpression = "Invalid expression.";
+        private static readonly string DecimalSeparator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
+        private static bool _floatingPointExpression;
 
-        public string Calculate(string equation)
+        public static string Calculate(this string equation)
         {
             equation = RemoveSpaces(equation);
-            _floatingPointExpression = equation.Contains(_decimalSeparator);
-            if (!ParenthesisIsBalanced(equation)) return _invalidExpression;
+            _floatingPointExpression = equation.Contains(DecimalSeparator[0]);
+            if (!ParenthesisIsBalanced(equation)) return InvalidExpression;
             equation = EvaluateParenthesisedPiecesOfEquation(equation);
             return WeightedCalculate(equation);
         }
@@ -30,7 +31,7 @@ namespace CommandCalculator
             return equation.Count(x => x == '(') == equation.Count(x => x == ')');
         }
 
-        private string EvaluateParenthesisedPiecesOfEquation(string equation)
+        private static string EvaluateParenthesisedPiecesOfEquation(string equation)
         {
             while (equation.Contains("("))
             {
@@ -52,7 +53,6 @@ namespace CommandCalculator
                     equationIndex++;
                 }
 
-                if (length <= 0) continue;
                 var subEquation = equation.Substring(startIndex, length);
                 var result = WeightedCalculate(subEquation);
                 equation = equation.Replace("(" + subEquation + ")", result);
@@ -61,19 +61,16 @@ namespace CommandCalculator
             return equation;
         }
 
-        private string WeightedCalculate(string equation)
+        private static string WeightedCalculate(string equation)
         {
             if (equation.Length == 0) return string.Empty;
-            if (equation.Contains(_invalidExpression)) return _invalidExpression;
 
             var list = BreakUpEquation(equation);
             ApplyNegatives(list);
-            if (list.Count % 2 == 0) return _invalidExpression; // Valid expression have an odd number of list
-            if (list.Count <= 1) return list.Count == 1 ? list[0] : _invalidExpression;
             CondenseListByCalculating(list, "^");
             CondenseListByCalculating(list, "/%*");
             CondenseListByCalculating(list, "+-");
-            return list.Count == 1 ? list[0] : _invalidExpression;
+            return list.Count == 1 ? list[0] : InvalidExpression;
         }
 
         private static List<string> BreakUpEquation(string equation)
@@ -82,7 +79,7 @@ namespace CommandCalculator
             var list = new List<string>();
             foreach (var character in equation)
             {
-                if (int.TryParse(character.ToString(), out var _) || character == _decimalSeparator)
+                if (int.TryParse(character.ToString(), out var _) || character == DecimalSeparator[0])
                 {
                     item += character;
                 }
@@ -103,7 +100,7 @@ namespace CommandCalculator
             return list;
         }
 
-        private void ApplyNegatives(List<string> list)
+        private static void ApplyNegatives(List<string> list)
         {
             if (list.IndexOf("-") == -1) return;
             var itemIndex = 0;
@@ -138,7 +135,7 @@ namespace CommandCalculator
             return itemIndex == 0 || !float.TryParse(list[itemIndex - 1], out var _);
         }
 
-        private void CondenseListByCalculating(IList<string> list, string mathsOperator)
+        private static void CondenseListByCalculating(IList<string> list, string mathsOperator)
         {
             if (list.Count == 1) return;
 
@@ -172,10 +169,10 @@ namespace CommandCalculator
             Debug.WriteLine($"{message}list = '{string.Join(' ', list)}'.");
         }
 
-        private string CalculateAsFloat(string number1, string operation, string number2)
+        private static string CalculateAsFloat(string number1, string operation, string number2)
         {
             if (!float.TryParse(number1, out var float1) ||
-                (!float.TryParse(number2, out var float2))) return _invalidExpression;
+                (!float.TryParse(number2, out var float2))) return InvalidExpression;
             switch (operation)
             {
                 case "^": return Math.Pow(float1, float2).ToString("F");
@@ -184,14 +181,14 @@ namespace CommandCalculator
                 case "%": return (float1 % float2).ToString("F");
                 case "+": return (float1 + float2).ToString("F");
                 case "-": return (float1 - float2).ToString("F");
-                default: return _invalidExpression;
+                default: return InvalidExpression;
             }
         }
 
-        private string CalculateAsInteger(string number1, string operation, string number2)
+        private static string CalculateAsInteger(string number1, string operation, string number2)
         {
             if (!int.TryParse(number1, out var integer1) ||
-                (!int.TryParse(number2, out var integer2))) return _invalidExpression;
+                (!int.TryParse(number2, out var integer2))) return InvalidExpression;
             switch (operation)
             {
                 case "^": return Math.Pow(integer1, integer2).ToString("F0");
@@ -200,7 +197,7 @@ namespace CommandCalculator
                 case "%": return (integer1 % integer2).ToString();
                 case "+": return (integer1 + integer2).ToString();
                 case "-": return (integer1 - integer2).ToString();
-                default: return _invalidExpression;
+                default: return InvalidExpression;
             }
         }
     }

@@ -22,19 +22,17 @@ namespace CommandCalculator
         [DataRow("21", "1+4^2+5 % 3 +12%5")]
         public void CalculationsTests(string expectedResult, string equation)
         {
-            var calc = new Calculator();
-            var result = calc.Calculate(equation);
+            var result = equation.Calculate();
             Assert.AreEqual(expectedResult, result);
         }
 
         [TestMethod]
         [DataRow("3", "1+5-(6/2)")]
-        [DataRow("6", "10+5-((6/2)*(6/2))")]
-        [DataRow("6", "10+5-(6/2)*(6/2)")]
+        [DataRow("15", "10+5-((6/2)-(6/2))")]
+        [DataRow("9", "10+5-(6/2)-(6/2)")]
         public void CalculationsWithBracketsTests(string expectedResult, string equation)
         {
-            var calc = new Calculator();
-            var result = calc.Calculate(equation);
+            var result = equation.Calculate();
             Assert.AreEqual(expectedResult, result);
         }
 
@@ -45,34 +43,32 @@ namespace CommandCalculator
         [DataRow("-4", "24/-6")]
         public void CalculationsWithNegativeNumbersTests(string expectedResult, string equation)
         {
-            var calc = new Calculator();
-            var result = calc.Calculate(equation);
+            var result = equation.Calculate();
             Assert.AreEqual(expectedResult, result);
         }
 
         [TestMethod]
         [DataRow("Invalid expression.", "-23+&23")]
-        [DataRow("Invalid expression.", "-23$23")]
+        [DataRow("Invalid expression.", "-23+$23.5")]
         [DataRow("Invalid expression.", "-24//6")]
         [DataRow("Invalid expression.", "1+(24/-6))")]
         [DataRow("Invalid expression.", "1+(24/-6O3)")]
+        [DataRow("Invalid expression.", "1+(2O4/-63)")]
         public void CalculationsWithErrorsTests(string expectedResult, string equation)
         {
-            var calc = new Calculator();
-            var result = calc.Calculate(equation);
+            var result = equation.Calculate();
             Assert.AreEqual(expectedResult, result);
         }
 
         [TestMethod]
         [DataRow("3.00", "24.3/8.1")]
         [DataRow("3.00", "24.0/8.0")]
-        [DataRow("31.50", "4.5*7")]
+        [DataRow("-31.50", "-4.5*7")]
         [DataRow("31.50", "8%5-3+4.5*7")]
         [DataRow("27.00", "3.0^3")]
         public void CalculationsForFloatingPointTests(string expectedResult, string equation)
         {
-            var calc = new Calculator();
-            var result = calc.Calculate(equation);
+            var result = equation.Calculate();
             Assert.AreEqual(expectedResult, result);
         }
     }
