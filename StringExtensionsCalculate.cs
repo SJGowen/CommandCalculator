@@ -15,7 +15,7 @@ namespace System
         {
             equation = RemoveSpaces(equation);
             _floatingPointExpression = equation.Contains(DecimalSeparator[0]);
-            if (!ParenthesisIsBalanced(equation)) return InvalidExpression;
+            if (!ParenthesisIsValid(equation)) return InvalidExpression;
             equation = EvaluateParenthesisedPiecesOfEquation(equation);
             return WeightedCalculate(equation);
         }
@@ -23,6 +23,11 @@ namespace System
         private static string RemoveSpaces(string equation)
         {
             return equation.Replace(" ", string.Empty);
+        }
+
+        private static bool ParenthesisIsValid(string equation)
+        {
+            return equation.IndexOf('(') <= equation.IndexOf(')') && ParenthesisIsBalanced(equation);
         }
 
         private static bool ParenthesisIsBalanced(string equation)
@@ -138,26 +143,24 @@ namespace System
         {
             if (list.Count == 1) return;
 
-            var itemIndex = 1; // Looking at operators only, hence start at 1 and increment by 2
+            var itemIndex = 0;
             while (itemIndex < list.Count)
             {
                 foreach (var mathsOp in mathsOperator)
                 {
                     WriteDebugMessageAndArray($"Looking at = '{list[itemIndex]}'.\tLooking for = '{mathsOp.ToString()}'.\t", list);
-                    if (list[itemIndex] == mathsOp.ToString())
-                    {
-                        list[itemIndex] = _floatingPointExpression 
-                            ? CalculateAsFloat(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1]) 
-                            : CalculateAsInteger(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1]);
+                    if (list[itemIndex] != mathsOp.ToString()) continue;
+                    list[itemIndex] = _floatingPointExpression
+                        ? CalculateAsFloat(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1])
+                        : CalculateAsInteger(list[itemIndex - 1], list[itemIndex], list[itemIndex + 1]);
 
-                        list.RemoveAt(itemIndex + 1);
-                        list.RemoveAt(itemIndex - 1);
-                        itemIndex -= 2;
-                        break;
-                    }
+                    list.RemoveAt(itemIndex + 1);
+                    list.RemoveAt(itemIndex - 1);
+                    itemIndex -= 2;
+                    break;
                 }
 
-                itemIndex += 2;
+                itemIndex++;
             }
 
             WriteDebugMessageAndArray($"After ConsolidateListByDoing ({mathsOperator}).\t", list);

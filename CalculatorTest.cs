@@ -29,7 +29,7 @@ namespace CommandCalculator
 
         [TestMethod]
         [DataRow("3", "1+5-(6/2)")]
-        [DataRow("15", "10+5-((6/2)-(6/2))")]
+        [DataRow("14", "10+5-((8/2)-(6/2))")]
         [DataRow("9", "10+5-(6/2)-(6/2)")]
         public void CalculationsWithBracketsTests(string expectedResult, string equation)
         {
@@ -55,6 +55,7 @@ namespace CommandCalculator
         [DataRow("Invalid expression.", "1+(24/-6))")]
         [DataRow("Invalid expression.", "1+(24/-6O3)")]
         [DataRow("Invalid expression.", "1+(2O4/-63)")]
+        [DataRow("Invalid expression.", ")3+5(")]
         public void CalculationsWithErrorsTests(string expectedResult, string equation)
         {
             var result = equation.Calculate();
