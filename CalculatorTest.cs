@@ -39,6 +39,7 @@ namespace CommandCalculator
 
         [TestMethod]
         [DataRow("-46", "-23+-23")]
+        [DataRow("0", "-23--23")]
         [DataRow("0", "-23+23")]
         [DataRow("4", "-24/-6")]
         [DataRow("-4", "24/-6")]
@@ -56,6 +57,7 @@ namespace CommandCalculator
         [DataRow("Invalid expression.", "1+(24/-6O3)")]
         [DataRow("Invalid expression.", "1+(2O4/-63)")]
         [DataRow("Invalid expression.", ")3+5(")]
+        [DataRow("Invalid expression.", "-23---23")]
         public void CalculationsWithErrorsTests(string expectedResult, string equation)
         {
             var result = equation.Calculate();

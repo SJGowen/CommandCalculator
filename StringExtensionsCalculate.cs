@@ -70,10 +70,18 @@ namespace System
             if (equation.Length == 0) return string.Empty;
 
             var list = BreakUpEquation(equation);
-            ApplyNegatives(list);
-            CondenseListByCalculating(list, "^");
-            CondenseListByCalculating(list, "/%*");
-            CondenseListByCalculating(list, "+-");
+            try
+            {
+                CondenseListByCalculating(list, "^");
+                CondenseListByCalculating(list, "/%*");
+                CondenseListByCalculating(list, "+-");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return InvalidExpression;
+            }
+
             return list.Count == 1 ? list[0] : InvalidExpression;
         }
 
@@ -94,6 +102,11 @@ namespace System
                         list.Add(item);
                         item = string.Empty;
                     }
+                    else if (character == '-')
+                    {
+                        item += character;
+                        continue;
+                    }
 
                     list.Add(character.ToString());
                 }
@@ -102,41 +115,6 @@ namespace System
             if (item != string.Empty) list.Add(item);
 
             return list;
-        }
-
-        private static void ApplyNegatives(List<string> list)
-        {
-            if (list.IndexOf("-") == -1) return;
-            var itemIndex = 0;
-            while (itemIndex < list.Count)
-            {
-                if (list[itemIndex] == "-" && ItemPrecededByNonNumeric(list, itemIndex))
-                {
-                    if (_floatingPointExpression)
-                    {
-                        if (float.TryParse(list[itemIndex + 1], out var float1))
-                        {
-                            list[itemIndex + 1] = (float1 * -1).ToString("F");
-                            list.RemoveAt(itemIndex);
-                        }
-                    }
-                    else
-                    {
-                        if (int.TryParse(list[itemIndex + 1], out var integer1))
-                        {
-                            list[itemIndex + 1] = (integer1 * -1).ToString();
-                            list.RemoveAt(itemIndex);
-                        }
-                    }
-                }
-
-                itemIndex++;
-            }
-        }
-
-        private static bool ItemPrecededByNonNumeric(IReadOnlyList<string> list, int itemIndex)
-        {
-            return itemIndex == 0 || !float.TryParse(list[itemIndex - 1], out var _);
         }
 
         private static void CondenseListByCalculating(IList<string> list, string mathsOperator)
@@ -166,6 +144,7 @@ namespace System
             WriteDebugMessageAndArray($"After ConsolidateListByDoing ({mathsOperator}).\t", list);
         }
 
+        [Conditional("DEBUG")]
         private static void WriteDebugMessageAndArray(string message, IEnumerable<string> list)
         {
             Debug.WriteLine($"{message}list = '{string.Join(' ', list)}'.");
